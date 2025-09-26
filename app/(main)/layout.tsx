@@ -11,7 +11,7 @@ export default async function mainLayout({  children }: { children: ReactNode })
 
      <main className="relative">
          {user ? <PrivateNav/> : <PublicNav/>}
-         <section className="pt-8">
+         <section className="pt-26">
              {children}
          </section>
      </main>

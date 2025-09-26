@@ -43,25 +43,8 @@ export default function PublicNav() {
                     <Link href="/login">
                         <img src="/logo.svg" alt="Calendly Clone Logo" className="w-8 h-8" />
                     </Link>
-                    <h1 className="text-xl text-blue-800 font-bold">Calendly Clone</h1>
+                    <h1 className="text-xl text-blue-800 font-bold">Calendra</h1>
                 </div>
-
-                {/* Desktop Navigation Items */}
-                <div className="hidden md:flex flex-row gap-6 items-center">
-                    <ul className="flex flex-row gap-6 justify-between items-center ">
-                        <li>
-                            <Link href="/" className="bg-blue-800 text-primary-foreground px-4 py-2 rounded-2xl hover:text-blue-500 duration-500 transition-colors font-medium">
-                                Home
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/calendar" className="bg-blue-800 text-primary-foreground px-4 py-2 rounded-2xl hover:text-blue-500 duration-500 transition-colors font-medium">
-                                Calendar
-                            </Link>
-                        </li>
-                    </ul>
-                </div>
-
                 {/* Authentication - Desktop */}
                 <div className="hidden md:flex items-center gap-4">
                     <SignedOut>

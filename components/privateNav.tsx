@@ -11,11 +11,11 @@ export default function PrivateNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="flex justify-between items-center fixed z-50 w-full h-28 bg-gray-200 px-10 gap-4 shadow-2xl mb-28">
+        <nav className="flex justify-between items-center fixed z-50 w-full h-20 bg-gray-200 px-10 gap-4 shadow-2xl mb-28">
             {/* Logo */}
             <Link href="/events" className="flex items-center gap-1 hover:scale-150 duration-500 ">
                 <Image
-                    src="/assets/logo.svg"
+                    src="/logo.svg"
                     width={60}
                     height={60}
                     alt="Let's talk"
