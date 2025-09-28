@@ -17,16 +17,18 @@ import {Button} from "../ui/button";
 import {AlertDialogFooter, AlertDialogHeader} from "@/components/ui/alert-dialog";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
-import {Switch} from "@radix-ui/react-switch";
 import {useTransition} from "react";
 import router from "next/router";
+import {createEvent, deleteEvent, updateEvent} from "@/server/actions/events";
+import Link from "next/link";
+import {Switch} from "@/components/ui/switch";
 
-export function eventForm({event,}: {
+export default function EventForm({event,}: {
                               event: {
                                   id: string,
                                   name: string,
                                   description?: string,
-                                  durationInMin: number,
+                                  durationInMinutes: number,
                                   isActive: boolean,
                               }
                           }
@@ -40,20 +42,20 @@ export function eventForm({event,}: {
             {
                 name: '',
                 description: '',
-                durationInMin: 30,
+                durationInMinutes: 30,
                 isActive: true,
             }
 
     })
     const [isDeletePending, startDeleteTransition] = useTransition()
 
-    const onSubmit = async (values: z.infer<typeof eventFormSchema>){
-        const action = event == null ? createEvent : updateEvent.bind(null,event.id)
+    const onSubmit =
+        async (values: z.infer<typeof eventFormSchema>) =>{
+        const action = event == null ? createEvent : updateEvent.bind(null, event.id)
         try {
-            await  action(values)
-        }
-        catch (error){
-            form.setError("root",error)
+            await action(values)
+        } catch (error: any) {
+            form.setError("root", error.message)
         }
     }
     return (
