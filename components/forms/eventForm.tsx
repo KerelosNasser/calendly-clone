@@ -4,17 +4,6 @@ import {z} from "zod";
 import {eventFormSchema} from "@/schema/events";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormItem, FormDescription, FormField, FormLabel, FormControl, FormMessage,} from "@/components/ui/form";
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogAction,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogCancel,
-    AlertDialogTitle
-} from "@radix-ui/react-alert-dialog";
-import {Button} from "../ui/button";
-import {AlertDialogFooter, AlertDialogHeader} from "@/components/ui/alert-dialog";
 import {Input} from "../ui/input";
 import {Textarea} from "../ui/textarea";
 import {useTransition} from "react";
@@ -22,6 +11,14 @@ import router from "next/router";
 import {createEvent, deleteEvent, updateEvent} from "@/server/actions/events";
 import Link from "next/link";
 import {Switch} from "@/components/ui/switch";
+import { Button } from "../ui/button";
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel,
+    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 
 export default function EventForm({event,}: {
                               event: {

@@ -111,6 +111,7 @@ export async function deleteEvent(
     } finally {
         // Revalidate the '/events' path to ensure the page fetches fresh data after the database operation
         revalidatePath('/events')
+        redirect("/events")
     }
 }
 
