@@ -119,7 +119,7 @@ export async function deleteEvent(
 type EventRow = typeof EventTable.$inferSelect
 
 // Async function to fetch all events (active and inactive) for a specific user
-export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
+export async function getEvents(clerkUserId: string, eventId: string): Promise<EventRow[]> {
     // Query the database for events where the clerkUserId matches
     const events = await db.query.EventTable.findMany({
         //where: — This defines a filter (a WHERE clause) for your query.
