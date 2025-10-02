@@ -16,7 +16,6 @@ import {DAYS_OF_WEEK_IN_ORDER} from "@/lib/constants";
 import {saveSchedule} from "@/server/actions/schedule";
 import {formatTimezoneOffset} from "@/lib/formatters";
 
-// Define the Availability type
 type Availability = {
     startTime: string
     endTime: string
@@ -33,7 +32,6 @@ export function ScheduleForm({
     }
 }) {
 
-    // Initialize form with validation schema and default values
     const form = useForm<z.infer<typeof scheduleFormSchema>>({
         resolver: zodResolver(scheduleFormSchema),
         defaultValues: {
@@ -45,12 +43,11 @@ export function ScheduleForm({
         },
     })
     const {
-        append: addAvailability, // Add a new availability entry
-        remove: removeAvailability, // Remove availability entry
-        fields: availabilityFields, // Current availability fields
+        append: addAvailability,
+        remove: removeAvailability,
+        fields: availabilityFields,
     } = useFieldArray({ name: "availabilities", control: form.control })
 
-    // Group availability fields by day of the week for UI rendering
     const groupedAvailabilityFields = Object.groupBy(
         availabilityFields.map((field, index) => ({ ...field, index })),
         availability => availability.dayOfWeek
@@ -70,8 +67,6 @@ export function ScheduleForm({
         }
     }
 
-
-
     return (
         <Form {...form}>
             <form
@@ -79,14 +74,12 @@ export function ScheduleForm({
                 onSubmit={form.handleSubmit(onSubmit)}
             >
 
-                {/* Show form-level error if any */}
                 {form.formState.errors.root && (
                     <div className="text-destructive text-sm">
                         {form.formState.errors.root.message}
                     </div>
                 )}
 
-                {/* Timezone selection */}
                 <FormField
                     control={form.control}
                     name="timezone"
@@ -113,16 +106,13 @@ export function ScheduleForm({
                     )}
                 />
 
-                {/* Availability form grid grouped by day */}
                 <div className="grid grid-cols-[auto_auto]  gap-y-6">
                     {DAYS_OF_WEEK_IN_ORDER.map(dayOfWeek => (
                         <Fragment key={dayOfWeek}>
-                            {/* Day label */}
                             <div className="capitalize text-sm font-semibold">
                                 {dayOfWeek.substring(0, 3)}
                             </div>
 
-                            {/* Add availability for a specific day */}
                             <div className="flex flex-col gap-2">
                                 <Button
                                     type="button"
@@ -139,12 +129,10 @@ export function ScheduleForm({
                                     <Plus  color="red" />
                                 </Button>
 
-                                {/* Render availability entries for this day */}
                                 {groupedAvailabilityFields[dayOfWeek]?.map(
                                     (field, labelIndex) => (
                                         <div className="flex flex-col gap-1" key={field.id}>
                                             <div className="flex gap-2 items-center">
-                                                {/* Start time input */}
                                                 <FormField
                                                     control={form.control}
                                                     name={`availabilities.${field.index}.startTime`}
@@ -163,7 +151,6 @@ export function ScheduleForm({
                                                     )}
                                                 />
                                                 -
-                                                {/* End time input */}
                                                 <FormField
                                                     control={form.control}
                                                     name={`availabilities.${field.index}.endTime`}
@@ -182,7 +169,6 @@ export function ScheduleForm({
                                                     )}
                                                 />
 
-                                                {/* Remove availability */}
                                                 <Button
                                                     type="button"
                                                     className="size-6 p-1 cursor-pointer hover:bg-red-900"
@@ -193,7 +179,6 @@ export function ScheduleForm({
                                                 </Button>
                                             </div>
 
-                                            {/* Show field-level validation messages */}
                                             <FormMessage>
                                                 {
                                                     form.formState.errors.availabilities?.at?.(
@@ -224,7 +209,6 @@ export function ScheduleForm({
                     ))}
                 </div>
 
-                {/* Save button */}
                 <div className="flex gap-2 justify-start">
                     <Button
                         className="cursor-pointer hover:scale-105 bg-blue-400 hover:bg-blue-600"

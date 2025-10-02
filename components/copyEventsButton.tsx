@@ -1,27 +1,21 @@
 "use client"
-// Marks this file for client-side rendering (required for hooks like useState)
 
 import {VariantProps} from "class-variance-authority"
-// VariantProps is a TypeScript utility type from the class-variance-authority (CVA) library. It’s used to type the props for variants (like size, color, style, etc.)
 import {Button, buttonVariants} from "./ui/button"
 import {cn} from "@/lib/utils"
 import {CopyIcon} from "lucide-react"
 import {useState} from "react"
 import {toast} from "sonner"
 
-
-// Define the possible visual states for the copy action
 type CopyState = "idle" | "copied" | "error"
 
-// Define the props for the CopyEventButton component
 interface CopyEventButtonProps
-    extends Omit<React.ComponentProps<"button">, "children" | "onClick">, // Inherit all native button props except children & onClick
-        VariantProps<typeof buttonVariants> { // Allow variant and size props from button styling
-    eventId: string // Required: event ID for the booking link
-    clerkUserId: string // Required: user ID for the booking link
+    extends Omit<React.ComponentProps<"button">, "children" | "onClick">,
+        VariantProps<typeof buttonVariants> {
+    eventId: string
+    clerkUserId: string
 }
 
-// Returns the appropriate button label based on the current copy state
 function getCopyLabel(state: CopyState) {
     switch (state) {
         case "copied":
@@ -34,38 +28,34 @@ function getCopyLabel(state: CopyState) {
     }
 }
 
-
-// Reusable button component that copies a URL to clipboard
 export function CopyEventButton({
                                     eventId,
                                     clerkUserId,
                                     className,
                                     variant,
                                     size,
-                                    ...props // Any other button props like disabled, type, etc.
+                                    ...props
                                 }: CopyEventButtonProps) {
 
-
-    const [copyState, setCopyState] = useState<CopyState>("idle") // Manage the copy feedback state
+    const [copyState, setCopyState] = useState<CopyState>("idle")
 
     const handleCopy = () => {
-        const url = `${location.origin}/book/${clerkUserId}/${eventId}` // Construct the booking URL
+        const url = `${location.origin}/book/${clerkUserId}/${eventId}`
 
         navigator.clipboard
-            .writeText(url) // Try to copy the URL
+            .writeText(url)
             .then(() => {
-                setCopyState("copied") // On success, show "Copied!" state
+                setCopyState("copied")
                 toast("Link copied successfully.", {
                     duration: 3000
                 })
-                setTimeout(() => setCopyState("idle"), 2000) // Reset after 2 seconds
+                setTimeout(() => setCopyState("idle"), 2000)
             })
             .catch(() => {
-                setCopyState("error") // On failure, show "Error" state
-                setTimeout(() => setCopyState("idle"), 2000) // Reset after 2 seconds
+                setCopyState("error")
+                setTimeout(() => setCopyState("idle"), 2000)
             })
     }
-
 
     return (
         <Button
@@ -73,13 +63,13 @@ export function CopyEventButton({
             className={cn(buttonVariants({
                 variant,
                 size
-            }), 'cursor-pointer', className)} // Apply variant/size classes + any custom classes
+            }), 'cursor-pointer', className)}
             variant={variant}
             size={size}
             {...props}
         >
-            <CopyIcon className="size-4 mr-2"/> {/* Icon that changes with copy state */}
-            {getCopyLabel(copyState)} {/* Text label that changes with copy state */}
+            <CopyIcon className="size-4 mr-2"/>
+            {getCopyLabel(copyState)}
         </Button>
     )
 }

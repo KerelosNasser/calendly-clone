@@ -6,27 +6,17 @@ import Link from "next/link";
 import EventCard from "@/components/cards/eventsCard";
 
 export default async function EventsPage() {
-    // Get the authenticated user's ID
     const { userId, redirectToSignIn } = await auth()
-    // Redirect to sign-in page if user is not authenticated
     if (!userId) return redirectToSignIn()
 
     const events = await getEvents(userId)
 
     return (
         <section className="flex flex-col items-center gap-16 animate-fade-in">
-            {/* Page title and "New Event" button */}
             <div className="flex gap-4 items-baseline">
                 <h1 className="text-4xl xl:text-5xl font-black mb-6">
                     Events
                 </h1>
-                {/*
-                        Without asChild, the Button would render as:
-                        <button><a href="/dashboard">Go to Dashboard</a></button> <!-- Invalid HTML -->
-                        With asChild, it renders as:
-                        <a href="/dashboard" class="...button styles...">Go to Dashboard</a> <!-- Valid HTML -->
-                        This is useful when you want to make another element (like a <Link>) look and behave like a button without breaking HTML semantics.
-                        */}
                 <Button
                     className="bg-blue-500 hover:bg-blue-400 text-white py-6 hover:scale-110 duration-500 border-b-4 border-blue-700 hover:border-blue-500 rounded-2xl shadow-accent-foreground text-2xl font-black"
                     asChild>
@@ -36,8 +26,6 @@ export default async function EventsPage() {
                 </Button>
             </div>
 
-
-            {/* Show event cards if any exist, otherwise show empty state */}
             {events.length > 0 ? (
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-10">
                     {events.map(event => (

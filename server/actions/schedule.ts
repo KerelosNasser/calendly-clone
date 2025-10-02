@@ -1,4 +1,3 @@
-// This server action handles saving a user's schedule by first validating the submitted form data using Zod and checking if the user is authenticated. If valid, it either inserts a new schedule or updates an existing one in the database, ensuring the schedule is linked to the authenticated user. It then clears any previously saved availabilities for that schedule and inserts the new ones provided by the user. All database operations are executed in a single batch to ensure consistency and efficiency.
 
 'use server'
 import { fromZonedTime } from "date-fns-tz"
@@ -17,6 +16,7 @@ import { addMinutes, areIntervalsOverlapping,
     isTuesday, isWednesday, isWithinInterval, setHours, setMinutes
 } from "date-fns"
 import {DAYS_OF_WEEK_IN_ORDER} from "@/lib/constants";
+import {getCalendarEventTimes} from "@/server/google/googleCalendar";
 
 type ScheduleRow = typeof ScheduleTable.$inferSelect
 type AvailabilityRow = typeof ScheduleAvailabilityTable.$inferSelect
@@ -25,14 +25,12 @@ export type FullSchedule = ScheduleRow & {
     availabilities: AvailabilityRow[]
 }
 
-// This function fetches the schedule (and its availabilities) for a given user from the database
 export async function getSchedule(userId: string): Promise<FullSchedule> {
-    // Query the ScheduleTable for the first record that matches the user's ID
-    // Also eagerly load the related 'availabilities' data
+
     const schedule = await db.query.ScheduleTable.findFirst({
         where: ({clerkUserId}, {eq}) => eq(clerkUserId, userId), // Match schedule where user ID equals the provided userId
         with: {
-            availabilities: true, // Include all related availability records
+            availabilities: true,
         },
     })
 
@@ -41,14 +39,13 @@ export async function getSchedule(userId: string): Promise<FullSchedule> {
 }
 
 
-// This server action saves the user's schedule and availabilities
 export async function saveSchedule(
-    unsafeData: z.infer<typeof scheduleFormSchema> // Accepts unvalidated form data
+    unsafeData: z.infer<typeof scheduleFormSchema>
 ) {
     try {
         const {userId} = await auth() // Get currently authenticated user's ID
 
-        // Validate the incoming data against the schedule schema
+
         const {success, data} = scheduleFormSchema.safeParse(unsafeData)
 
         // If validation fails or no user is authenticated, throw an error
@@ -56,7 +53,6 @@ export async function saveSchedule(
             throw new Error("Invalid schedule data or user not authenticated.")
         }
 
-        // Destructure availabilities and the rest of the schedule data
         const {availabilities, ...scheduleData} = data
 
         // Insert or update the user's schedule and return the schedule ID
@@ -77,36 +73,27 @@ export async function saveSchedule(
                 .where(eq(ScheduleAvailabilityTable.scheduleId, scheduleId)),
         ]
 
-        // If there are availabilities, prepare an insert operation for them
         if (availabilities.length > 0) {
             statements.push(
                 db.insert(ScheduleAvailabilityTable).values(
                     availabilities.map(availability => ({
                         ...availability,
-                        scheduleId, // Link availability to the saved schedule
+                        scheduleId,
                     }))
                 )
             )
         }
 
-        // Run all statements in a single transaction
         await db.batch(statements)
 
     } catch (error: any) {
-        // Catch and throw an error with a readable message
         throw new Error(`Failed to save schedule: ${error.message || error}`)
     } finally {
-        // Revalidate the /schedule path to update the cache and reflect the new data
         revalidatePath('/schedule')
     }
 }
 
 
-/**
- * Filters a list of time slots to return only those that:
- * 1. Match the user's availability schedule
- * 2. Do not overlap with existing Google Calendar events
- */
 export async function getValidTimesFromSchedule(
     timesInOrder: Date[], // All possible time slots to check
     event: { clerkUserId: string; durationInMinutes: number } // Event-specific data
@@ -114,11 +101,9 @@ export async function getValidTimesFromSchedule(
 
     const {clerkUserId: userId, durationInMinutes} = event
 
-    // Define the start and end of the overall range to check
     const start = timesInOrder[0]
     const end = timesInOrder.at(-1)
 
-    // If start or end is missing, there are no times to check
     if (!start || !end) return []
 
     // Fetch the user's saved schedule along with their availabilities
@@ -133,15 +118,12 @@ export async function getValidTimesFromSchedule(
         a => a.dayOfWeek
     )
 
-    // Fetch all existing Google Calendar events between start and end
     const eventTimes = await getCalendarEventTimes(userId, {
         start,
         end,
     })
 
-    // Filter and return only valid time slots based on availability and conflicts
     return timesInOrder.filter(intervalDate => {
-        // Get the user's availabilities for the specific day, adjusted to their timezone
         const availabilities = getAvailabilities(
             groupedAvailabilities,
             intervalDate,
@@ -149,23 +131,19 @@ export async function getValidTimesFromSchedule(
         )
 
 
-        // Define the time range for a potential event starting at this interval
         const eventInterval = {
-            start: intervalDate, // Proposed start time
-            end: addMinutes(intervalDate, durationInMinutes), // Proposed end time (start + duration)
+            start: intervalDate,
+            end: addMinutes(intervalDate, durationInMinutes),
         }
 
-        // Keep only the time slots that satisfy two conditions:
         return (
-            // 1. This time slot does not overlap with any existing calendar events
             eventTimes.every((eventTime: Interval<DateArg<Date>, DateArg<Date>>) => {
                 return !areIntervalsOverlapping(eventTime, eventInterval)
             }) &&
-            // 2. The entire proposed event fits within at least one availability window
             availabilities.some(availability => {
                 return (
-                    isWithinInterval(eventInterval.start, availability) && // Start is inside availability
-                    isWithinInterval(eventInterval.end, availability) // End is inside availability
+                    isWithinInterval(eventInterval.start, availability) &&
+                    isWithinInterval(eventInterval.end, availability)
                 )
             })
         )

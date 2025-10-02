@@ -1,10 +1,9 @@
-// Import the Neon serverless client for PostgreSQL
+//Import the Neon serverless client for PostgreSQL
 import { neon } from "@neondatabase/serverless"
 // Import Drizzle's Neon HTTP driver for ORM support
 import { drizzle } from "drizzle-orm/neon-http"
 
-// Import your database schema definitions (e.g., tables) from the local schema file
-import * as schema from "./schema"
+// Import your database schema definitions (e.g., tables) from the local schema fileimport * as schema from "./schema"
 
 // Initialize the Neon client using the DATABASE_URL from your environment variables
 const sql = neon(process.env.DATABASE_URL!)

@@ -11,10 +11,9 @@ export default function PublicNav() {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // Close menu when resizing to larger screens
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 768) { // md breakpoint
+            if (window.innerWidth >= 768) {
                 setIsMenuOpen(false);
             }
         };
@@ -23,12 +22,10 @@ export default function PublicNav() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Close menu when clicking on a link
     const handleLinkClick = () => {
         setIsMenuOpen(false);
     };
 
-    // Hide navbar on authentication pages
     const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
 
     if (isAuthPage) {
@@ -38,14 +35,12 @@ export default function PublicNav() {
     return (
         <nav className="bg-background border-b border-border w-full h-16 flex items-center shadow-sm">
             <div className="container mx-auto px-4 flex justify-between items-center">
-                {/* Logo */}
                 <div className="flex flex-row gap-2 justify-start items-center hover:scale-120 duration-500">
                     <Link href="/login">
                         <img src="/logo.svg" alt="Calendly Clone Logo" className="w-8 h-8" />
                     </Link>
                     <h1 className="text-xl text-blue-800 font-bold">Calendra</h1>
                 </div>
-                {/* Authentication - Desktop */}
                 <div className="hidden md:flex items-center gap-4">
                     <SignedOut>
                         <SignInButton>
@@ -67,7 +62,6 @@ export default function PublicNav() {
                     <ModeToggle/>
                 </div>
 
-                {/* Mobile menu button */}
                 <div className="md:hidden flex items-center">
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -75,12 +69,10 @@ export default function PublicNav() {
                         aria-label="Toggle menu"
                     >
                         {isMenuOpen ? (
-                            // X icon when menu is open
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         ) : (
-                            // Hamburger icon when menu is closed
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
@@ -89,7 +81,6 @@ export default function PublicNav() {
                 </div>
             </div>
 
-            {/* Mobile menu */}
             {isMenuOpen && (
                 <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border shadow-lg">
                     <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
@@ -114,7 +105,6 @@ export default function PublicNav() {
                             </li>
                         </ul>
 
-                        {/* Authentication - Mobile */}
                         <div className="pt-4 border-t border-border">
                             <SignedOut>
                                 <SignInButton className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium" />
